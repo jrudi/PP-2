@@ -25,5 +25,45 @@ public class GameState {
 		this.score = 0;
 		this.level = 1;
 	}
+
+	public boolean isGameActive() {
+		return gameActive;
+	}
+
+	public void setGameActive(boolean gameActive) {
+		this.gameActive = gameActive;
+	}
+
+	public Vector<GameObject> getObjectList() {
+		return objectList;
+	}
+
+	public void setObjectList(Vector<GameObject> objectList) {
+		this.objectList = objectList;
+	}
+	
+	public void addObject(GameObject go){
+		this.objectList.addElement(go);
+	}
+	
+	public void removeObject(GameObject go){
+		this.objectList.remove(go);
+	}
+
+	public long getScore() {
+		return score;
+	}
+
+	public void setScore(long score) {
+		this.score = score;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
 	
 }

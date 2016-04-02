@@ -7,12 +7,17 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+
+import io.ImageLoader;
+import objects.*;
 
 @SuppressWarnings("serial")
 public class GameFrame extends JFrame {
@@ -77,7 +82,8 @@ public class GameFrame extends JFrame {
 				
 				if (jButton.getText().equals("Anhalten")) {
 					jButton.setText("Fortsetzen");
-					// TODO
+					GameController.getInstance().getGameState().addObject(new Building());
+					repaintGamePanel();
 				}
 				else if (jButton.getText().equals("Fortsetzen")) {
 					jButton.setText("Anhalten");
@@ -146,8 +152,11 @@ public class GameFrame extends JFrame {
 			graphics2D.setColor(GameSettings.gamePanelBackgroundColor);
 			graphics2D.fillRect(0, 0, width, height);
 			
-			//TODO
-			
+			Vector<GameObject> obj = GameController.getInstance().getGameState().getObjectList();
+			for(GameObject x:obj){
+				Point2D.Double pt = x.getPosition();
+				g.drawImage(ImageLoader.getBlueHouseImage(GameSettings.houseBlueWidth,GameSettings.houseBlueHeight),(int)pt.getX(),(int)pt.getY(),null);
+			}
 		}
 		
 		public int getHeight() {
