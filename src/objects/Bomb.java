@@ -1,10 +1,22 @@
 package objects;
 
+import java.awt.geom.Area;
+
+import game.*;
+
+
 public class Bomb extends GameObject implements Damaging{
+	
+	int pos;
+	
+	public Bomb(int pos) {
+		if(pos>=0&&pos<=GameSettings.gamePanelWidth){
+			this.pos=pos;
+		}
+	}
 
 	@Override
 	public int getCausingDamage() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -22,8 +34,10 @@ public class Bomb extends GameObject implements Damaging{
 
 	@Override
 	public boolean collide(GameObject gameObjectToCheck) {
-		// TODO Auto-generated method stub
-		return false;
+		Area a = new Area(this.polygon);
+		Area b = new Area(gameObjectToCheck.polygon);
+		a.intersect(b);
+		return !a.isEmpty();
 	}
 
 	@Override
@@ -34,8 +48,16 @@ public class Bomb extends GameObject implements Damaging{
 
 	@Override
 	public boolean outOfView() {
-		// TODO Auto-generated method stub
-		return false;
+		return(this.position.getX()>GameSettings.gamePanelWidth)||
+				(this.position.getY()>GameSettings.gamePanelHeight);
+		
+	}
+
+	public void drop(int i) {
+		if(!outOfView()){
+			this.position.setLocation(position.getX(), position.getY()+i);
+		}
+		
 	}
 
 }

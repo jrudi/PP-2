@@ -37,6 +37,7 @@ public abstract class GameObject extends Thread implements Explosive {
 		this.damage = 0;
 		this.active = true;
 		this.gameRelevant = false;
+		this.position = new Point2D.Double(40.0,40.0);
 	}
 	
 	/**
@@ -62,6 +63,7 @@ public abstract class GameObject extends Thread implements Explosive {
 	 * @param graphics2D Graphics2D
 	 * */
 	public void draw(Graphics2D graphics2D) {
+		graphics2D.translate(position.x, position.y);
 		graphics2D.setColor(this.color);
 		graphics2D.fill(this.polygon);
 		graphics2D.setColor(Color.black);
