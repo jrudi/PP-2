@@ -44,7 +44,7 @@ public class GameController {
 		this.gameState = new GameState();
 		this.gameFrame = new GameFrame();
 		createTown();
-		startGame();
+		//startGame();
 	}
 
 	/**
@@ -57,18 +57,19 @@ public class GameController {
 	public void createTown() {
 		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(0, 0)));
 		gameState.addObject(new Building(BuildingType.REDHOUSE, new Point2D.Double(GameSettings.houseBlueWidth, 0)));
-		gameState.addObject(new Building(BuildingType.YELLOWHOUSE, new Point2D.Double(GameSettings.houseRedWidth, 0)));
-		gameState.addObject(new Building(BuildingType.CHURCH, new Point2D.Double(GameSettings.houseYellowWidth, 0)));
-		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(GameSettings.churchWidth, 0)));
-		gameState.addObject(new Player(new Point2D.Double(0,250)));
+		gameState.addObject(new Building(BuildingType.YELLOWHOUSE, new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth, 0)));
+		gameState.addObject(new Building(BuildingType.CHURCH, new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth + GameSettings.houseYellowWidth, 0)));
+		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth + GameSettings.houseYellowWidth + GameSettings.churchWidth, 0)));
+		gameState.addObject(new Player(new Point2D.Double(250,250)));
+		gameState.addObject(new Bomb(new Point2D.Double(250, 480)));
 	}
 
 	/** Startet Spiel zum ersten Mal. */
 	public void startGame() {
-		gameManagementThread = new GameManagementThread();
-		bombCreatorThread = new BombCreatorThread();
-		gameManagementThread.start();
-		bombCreatorThread.start();
+		//gameManagementThread = new GameManagementThread();
+		//bombCreatorThread = new BombCreatorThread();
+		//gameManagementThread.start();
+		//bombCreatorThread.start();
 
 	}
 

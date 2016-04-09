@@ -68,6 +68,8 @@ public abstract class GameObject extends Thread implements Explosive {
 		graphics2D.fill(this.polygon);
 		graphics2D.setColor(Color.black);
 		graphics2D.draw(this.polygon);
+		graphics2D.translate(-position.x, -position.y);
+
 	}
 	
 	/**
