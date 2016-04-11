@@ -3,6 +3,7 @@ package objects;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 
+import game.GameController;
 import game.GameSettings;
 
 public class Player extends GameObject implements Damageable{
@@ -56,5 +57,21 @@ public class Player extends GameObject implements Damageable{
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public void moveLeft() {
+		position.x = position.getX()-10;
+	}
+	
+	public void moveRight(){
+		position.x = position.getX()-10;
+
+	}
+
+	public void shoot() {
+		Bomb b = new Bomb(position);
+		GameController.getInstance().getGameState().addObject(b);
+	}
+
+	
 
 }

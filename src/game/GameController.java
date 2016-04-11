@@ -2,12 +2,7 @@ package game;
 
 import java.awt.geom.Point2D;
 import java.util.Vector;
-
-import objects.Bomb;
-import objects.Building;
-import objects.BuildingType;
-import objects.GameObject;
-import objects.Player;
+import objects.*;
 
 public class GameController {
 
@@ -44,7 +39,7 @@ public class GameController {
 		this.gameState = new GameState();
 		this.gameFrame = new GameFrame();
 		createTown();
-		//startGame();
+		// startGame();
 	}
 
 	/**
@@ -57,20 +52,23 @@ public class GameController {
 	public void createTown() {
 		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(0, 0)));
 		gameState.addObject(new Building(BuildingType.REDHOUSE, new Point2D.Double(GameSettings.houseBlueWidth, 0)));
-		gameState.addObject(new Building(BuildingType.YELLOWHOUSE, new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth, 0)));
-		gameState.addObject(new Building(BuildingType.CHURCH, new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth + GameSettings.houseYellowWidth, 0)));
-		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth + GameSettings.houseYellowWidth + GameSettings.churchWidth, 0)));
-		gameState.addObject(new Player(new Point2D.Double(250,250)));
+		gameState.addObject(new Building(BuildingType.YELLOWHOUSE,
+				new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth, 0)));
+		gameState.addObject(new Building(BuildingType.CHURCH, new Point2D.Double(
+				GameSettings.houseBlueWidth + GameSettings.houseRedWidth + GameSettings.houseYellowWidth, 0)));
+		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(GameSettings.houseBlueWidth
+				+ GameSettings.houseRedWidth + GameSettings.houseYellowWidth + GameSettings.churchWidth, 0)));
 		gameState.addObject(new Bomb(new Point2D.Double(250, 480)));
 	}
 
 	/** Startet Spiel zum ersten Mal. */
 	public void startGame() {
-		//gameManagementThread = new GameManagementThread();
-		//bombCreatorThread = new BombCreatorThread();
-		//gameManagementThread.start();
-		//bombCreatorThread.start();
-
+		gameManagementThread = new GameManagementThread();
+		bombCreatorThread = new BombCreatorThread();
+		gameManagementThread.start();
+		bombCreatorThread.start();
+		gameState.addObject(new Player(new Point2D.Double(250, 250)));
+		gameState.setGameActive(true);
 	}
 
 	/** Startet das Spiel neu. */
@@ -98,6 +96,7 @@ public class GameController {
 
 	private class BombCreatorThread extends Thread {
 		Vector<Bomb> bombList = new Vector<Bomb>();
+
 		public void run() {
 
 			int wait = GameSettings.bombCreatorStartPause
@@ -105,7 +104,7 @@ public class GameController {
 			wait = wait < GameSettings.bombCreatorMinPause ? GameSettings.bombCreatorMinPause : wait;
 
 			try {
-				this.wait(wait);
+				this.wait((long)wait);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -114,8 +113,8 @@ public class GameController {
 			Bomb bomb = new Bomb(pos);
 			bombList.add(bomb);
 			gameState.getObjectList().add(bomb);
-			
-			for(Bomb b:bombList){
+
+			for (Bomb b : bombList) {
 				b.drop(10);
 			}
 		}
@@ -148,16 +147,27 @@ public class GameController {
 		public void run() {
 
 			while (true) {
-				for (GameObject x : gameState.getObjectList()) {
-					for (GameObject y : gameState.getObjectList()) {
-						if (!x.equals(y) && x.collide(y)) {
-							System.out.println("halo");
+				if (gameState.isGameActive()) {
+
+					/*for (GameObject x : gameState.getObjectList()) {
+						
+						for (GameObject y : gameState.getObjectList()) {
+							
+							if (!x.equals(y) && x.collide(y)) {
+								System.out.println("halo");
+							}
+
 						}
-					}
+					}*/
 				}
 			}
 
+		
+		
 		}
+		
+		
+		
 	}
 
 }

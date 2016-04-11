@@ -1,8 +1,10 @@
 package game;
 
+import java.awt.geom.Point2D;
 import java.util.Vector;
 
 import objects.GameObject;
+import objects.Player;
 
 
 public class GameState {
@@ -18,12 +20,17 @@ public class GameState {
 	/** Aktuelles Level. Je hoeher das Level, desto weiter fortgeschritten das Spiel und desto kuerzer die Pausenzeiten zwischen der Generierung 
 	 * neuer Bomb-Objekte des bombCreatorThreads. */
 	private int level;
+	private Player player;
 	
 	public GameState () {
 		this.objectList = new Vector<GameObject>();
 		this.gameActive = false;
 		this.score = 0;
 		this.level = 1;
+		player = new Player(new Point2D.Double(250,250));
+		if(!objectList.contains(player)){
+			objectList.add(0, player);
+		}
 	}
 
 	public boolean isGameActive() {
@@ -43,7 +50,8 @@ public class GameState {
 	}
 	
 	public void addObject(GameObject go){
-		this.objectList.addElement(go);
+		if(go instanceof Player) this.objectList.add(0,go);
+		else this.objectList.addElement(go);
 	}
 	
 	public void removeObject(GameObject go){
@@ -64,6 +72,10 @@ public class GameState {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 	
 }

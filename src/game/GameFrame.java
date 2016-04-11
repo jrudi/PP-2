@@ -210,12 +210,41 @@ private class GameOverFrame extends JFrame {
 	}
 
 }
+private class PlayerMover implements KeyListener{
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(GameController.getInstance().getGameState().isGameActive()){
+			
+		
+		if(e.getKeyCode()==KeyEvent.VK_LEFT){
+			GameController.getInstance().getGameState().getPlayer().moveLeft();
+		}else if(e.getKeyCode()==KeyEvent.VK_RIGHT){
+			GameController.getInstance().getGameState().getPlayer().moveRight();
+		}else if(e.getKeyCode()==KeyEvent.VK_UP){
+			GameController.getInstance().getGameState().getPlayer().shoot();
+		}
+		
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		
+	}
+	
+}
 
 private class RepainterThread extends Thread {
 	// TODO Run-Methode soll das GamePanel in kurzen Abstaenden neu zeichen.
 	public void run(){
 		while(GameController.getInstance().getGameState().isGameActive()){
-			
+			repaintGamePanel();
 		}
 	}
 
