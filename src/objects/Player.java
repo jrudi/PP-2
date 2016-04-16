@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 
-import game.GameController;
 import game.GameSettings;
 import io.ImageLoader;
 
@@ -17,15 +16,14 @@ public class Player extends GameObject implements Damageable {
 		this.position = double1;
 		this.right = true;
 		this.maximumDamage = 4;
+		this.damage = 0;
 		this.color = Color.BLACK;
 		this.dX = GameSettings.playerDX;
 		this.height = GameSettings.playerHeight;
 		this.width = GameSettings.playerWidth;
-		playerLeft = ImageLoader.getPlayerLookingToLeftImage(GameSettings.gamePanelWidth, GameSettings.playerHeight);
-		playerRight = ImageLoader.getPlayerLookingToRightImage(GameSettings.gamePanelWidth, GameSettings.playerHeight);
-		initPolygon(true);
-
-
+		this.playerLeft = ImageLoader.getPlayerLookingToLeftImage(width,height);
+		this.playerRight = ImageLoader.getPlayerLookingToRightImage(width, height);
+		this.initPolygon(true);
 
 	}
 
@@ -44,6 +42,7 @@ public class Player extends GameObject implements Damageable {
 	@Override
 	public void increaseDamage(int damage) {
 		this.damage +=damage;
+		System.out.println("dmg " + this.damage);
 	}
 	
 	public boolean isRight(){
@@ -89,7 +88,7 @@ public class Player extends GameObject implements Damageable {
 
 			position.setLocation(position.getX() + polygon.getBounds().getWidth(), position.getY());
 		}
-		if (position.getX()>60) {
+		if (position.getX()>50) {
 
 			position = new Point2D.Double(position.getX() - dX, position.getY());
 			//System.out.println(" nach " + position.getX());
@@ -106,7 +105,7 @@ public class Player extends GameObject implements Damageable {
 			flipPolygonHorizontally();
 			position.setLocation(position.getX() - polygon.getBounds().getWidth(), position.getY());
 		}
-		if (position.getX()<390) {
+		if (position.getX()<400) {
 
 			position = new Point2D.Double(position.getX() + dX, position.getY());
 			//System.out.println(" nach " + position.getX());
@@ -117,14 +116,5 @@ public class Player extends GameObject implements Damageable {
 
 	}
 
-	public void shoot() {
-		Bullet b = new Bullet(new Point2D.Double(position.getX(),position.getY()));
-		GameController.getInstance().getGameState().getObjectList().add(b);
-		b.start();
-	}
-
-	public void run() {
-
-	}
-
+	
 }

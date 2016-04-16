@@ -3,6 +3,8 @@ package objects;
 import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.geom.Point2D.Double;
+
+import game.GameController;
 public class Bullet extends GameObject implements Damageable, Damaging{
 
 	public Bullet(Double position) {
@@ -63,7 +65,7 @@ public class Bullet extends GameObject implements Damageable, Damaging{
 	@Override
 	public boolean outOfView() {
 		
-		return position.getX()>500;
+		return position.getY()>500;
 	}
 	public void run(){
 		while(this.isActive()){
@@ -77,6 +79,7 @@ public class Bullet extends GameObject implements Damageable, Damaging{
 		}
 		if(outOfView()){
 			this.setActive(false);
+			GameController.getInstance().getGameState().getObjectList().remove(this);
 		}
 	}
 

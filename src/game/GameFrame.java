@@ -27,6 +27,8 @@ public class GameFrame extends JFrame {
 	private JLabel level;
 	/** Anzeige der bisher gesammelten Punkte */
 	private JLabel score;
+	private JLabel threads;
+
 	private RepainterThread repainterThread;
 	private GameFrameUpdater gfu;
 
@@ -120,6 +122,8 @@ public class GameFrame extends JFrame {
 		level.setText("Level: -");
 		score = new JLabel();
 		score.setText("Punkte -");
+		threads = new JLabel();
+		threads.setText("-");
 
 		panel.add(switchButton);
 		panel.add(startButton);
@@ -127,6 +131,7 @@ public class GameFrame extends JFrame {
 		panel.add(lifePoints);
 		panel.add(level);
 		panel.add(score);
+		panel.add(threads);
 
 		return panel;
 	}
@@ -165,11 +170,11 @@ public class GameFrame extends JFrame {
 			setPreferredSize(new Dimension(width, height));
 
 			// Listener zu testzwecken, zeigt mausposition an
-			// this.addMouseListener(new MouseAdapter() {
-			// public void mouseClicked(MouseEvent e) {
-			// System.out.println("X: " + e.getX() + "Y: " + e.getY());
-			// }
-			// });
+			/* this.addMouseListener(new MouseAdapter() {
+			 public void mouseClicked(MouseEvent e) {
+			 System.out.println("X: " + e.getX() + "Y: " + e.getY());
+			 }
+			 });*/
 
 			this.setFocusable(true);
 
@@ -238,7 +243,7 @@ public class GameFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					GameOverFrame.this.dispose();
 					GameController.getInstance().restartGame();
-				}
+				}	
 			});
 
 			c.add(gameOverLabel, BorderLayout.NORTH);
@@ -284,7 +289,7 @@ public class GameFrame extends JFrame {
 					break;
 				case KeyEvent.VK_UP:
 					int x = (int) p.getPosition().getX();
-					x = p.isRight()?x+p.getWidth():x-p.getWidth();
+					x = p.isRight()?x+p.getWidth()/2:x-p.getWidth()/2;
 					int y = (int) (p.getPosition().getY()+10);
 					Bullet b = new Bullet(new Point2D.Double(x,y));
 					oL.add(b);
@@ -337,6 +342,8 @@ public class GameFrame extends JFrame {
 
 				 int currentLife = GameController.getInstance().getGameState().getLife();
 				lifePoints.setText("Leben: "+ currentLife);
+				
+				threads.setText(Thread.activeCount()+"");
 
 			}
 		}

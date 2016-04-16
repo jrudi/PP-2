@@ -52,9 +52,9 @@ public class Bomb extends GameObject implements Damaging {
 		Area a = new Area(this.polygon);
 		Area b = new Area(gameObjectToCheck.polygon);
 		a.intersect(b);
-		if (!a.isEmpty()) {
+		if (!a.isEmpty()&&this.isActive()) {
 			this.setActive(false);
-			gameObjectToCheck.setActive(false);
+//			gameObjectToCheck.setActive(false);
 			GameController.getInstance().getGameState().getObjectList().remove(this);
 
 			if (gameObjectToCheck instanceof Bullet) {
@@ -75,11 +75,13 @@ public class Bomb extends GameObject implements Damaging {
 			} else if (gameObjectToCheck instanceof Player) {
 				Player y = (Player) gameObjectToCheck;
 				y.increaseDamage(this.getCausingDamage());
+				GameController.getInstance().getGameState().setLife(y.getLifePoints());
+
 				if (y.getLifePoints() <= 0) {
 					gameObjectToCheck.setActive(false);
 					GameController.getInstance().getGameState().getObjectList().remove(gameObjectToCheck);
 					GameController.getInstance().endGame();
-					GameController.getInstance().getGameState().setLife(y.getLifePoints());
+					System.out.println(y.getLifePoints());
 				}
 
 			}
@@ -119,6 +121,7 @@ public class Bomb extends GameObject implements Damaging {
 			this.drop(0.5);
 			if (this.outOfView()) {
 				this.setActive(false);
+				GameController.getInstance().getGameState().getObjectList().remove(this);
 			}
 		}
 	}

@@ -79,11 +79,12 @@ public class GameController {
 
 	/** Startet das Spiel neu. */
 	public void restartGame() {
-		gameManagementThread.interrupt();
-		bombCreatorThread.interrupt();
-		gameState = new GameState();
-
-		startGame();
+		gameFrame.dispose();
+//		for(GameObject x:gameState.getObjectList()){
+//			if(x.isAlive()) x.();
+//		}
+		initiate();
+		
 
 	}
 
@@ -103,14 +104,34 @@ public class GameController {
 	}
 
 	private class BombCreatorThread extends Thread {
+		long timer = System.currentTimeMillis();
 
 		public void run() {
 
 			while (gameState.isGameActive()) {
 
-				int wait = GameSettings.bombCreatorStartPause;
+				int wait = gameState.getLevel()<=7? GameSettings.bombCreatorStartPause - GameSettings.bombCreatorDecreaseNumber*(gameState.getLevel()-1):GameSettings.bombCreatorMinPause;
 				
-				switch(gameState.getLevel()){
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+
+				}
+				
+				if(System.currentTimeMillis()-timer>wait){
+					System.out.println(System.currentTimeMillis()-timer);
+
+					int pos = (int) ((Math.random() * 400));
+					Bomb bomb = new Bomb(new Point2D.Double(pos, 500));
+					gameState.addObject(bomb);
+					bomb.start();
+					long now = System.currentTimeMillis();
+					timer = now;
+					System.out.println("Ist: " + (now - start) + "ms");
+					start = now;
+				}
+				/*switch(gameState.getLevel()){
 				case 1: 
 					wait = GameSettings.bombCreatorStartPause;
 					break;
@@ -136,23 +157,11 @@ public class GameController {
 					wait = 1500;
 					break;
 				}
-
-				try {
-					Thread.sleep(2*(long) wait);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-
-				}
-				int pos = (int) (Math.random() * GameSettings.gamePanelWidth);
-				long now = System.currentTimeMillis();
-
-				Bomb bomb = new Bomb(new Point2D.Double(pos, 500));
-				System.out.println("bomb dropped lvl " + gameState.getLevel() + " " + wait);
-				System.out.println("Diff: " + (now - start));
-				System.out.println(java.lang.Thread.activeCount());
-				start = now;
-				gameState.addObject(bomb);
-				bomb.start();
+				*/
+				
+				
+				
+				
 			}
 		}
 	}
@@ -162,11 +171,12 @@ public class GameController {
 		 * TODO Kollision Schaeden Deaktivierte Objects entfernen GameOver
 		 * Levels Scores Summe aller getScore()
 		 */
+		
 		public void run() {
 
 			while (gameState.isGameActive()) {
 				try {
-					Thread.sleep(100);
+					Thread.sleep(50);
 				} catch (InterruptedException ie) {
 					ie.printStackTrace();
 				}

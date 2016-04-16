@@ -27,6 +27,7 @@ public class GameState {
 		this.gameActive = false;
 		this.score = 0;
 		this.level = 1;
+		this.lives=5;
 	
 	}
 
