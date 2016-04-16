@@ -9,18 +9,11 @@ import game.*;
 
 public class Bomb extends GameObject implements Damaging{
 	
-	int pos;
-	
-	public Bomb(int pos) {
-		if(pos>=0&&pos<=GameSettings.gamePanelWidth){
-			this.pos=pos;
-		}
-		initPolygon();
-	}
 	
 	public Bomb(Point2D.Double double1) {
 		this.position = double1;
 		initPolygon();
+		this.setActive(true);
 	}
 
 	public void initPolygon(){
@@ -28,8 +21,8 @@ public class Bomb extends GameObject implements Damaging{
 		int[] yC = new int[GameSettings.bombPolygonYValues.length];
 
 	for (int i = 0; i < GameSettings.bombPolygonXValues.length; i++) {
-			xC[i] = (int)(GameSettings.bombPolygonXValues[i]*GameSettings.bombSize);
-			yC[i] = (int)(GameSettings.bombPolygonYValues[i]*(-GameSettings.bombSize));
+			xC[i] = (int)((GameSettings.bombPolygonXValues[i]*GameSettings.bombSize)+position.getX());
+			yC[i] = (int)(GameSettings.bombPolygonYValues[i]*(-GameSettings.bombSize)+position.getY());
 		 
 	}
 	this.polygon = new Polygon(xC,yC,xC.length);
@@ -74,9 +67,21 @@ public class Bomb extends GameObject implements Damaging{
 
 	public void drop(int i) {
 		if(!outOfView()){
-			this.position.setLocation(position.getX(), position.getY()+i);
+			this.position.setLocation(position.getX(), position.getY()-i);
+			initPolygon();
 		}
 		
+	}
+	
+	public void run(){
+		while(this.isActive()){
+			try{
+				Thread.sleep(20);
+			}catch(InterruptedException ie){
+				ie.printStackTrace();
+			}
+			this.drop(1);
+		}
 	}
 
 }

@@ -38,8 +38,9 @@ public class GameController {
 	public void initiate() {
 		this.gameState = new GameState();
 		this.gameFrame = new GameFrame();
+		startGame();
+
 		createTown();
-		// startGame();
 	}
 
 	/**
@@ -58,7 +59,6 @@ public class GameController {
 				GameSettings.houseBlueWidth + GameSettings.houseRedWidth + GameSettings.houseYellowWidth, 0)));
 		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(GameSettings.houseBlueWidth
 				+ GameSettings.houseRedWidth + GameSettings.houseYellowWidth + GameSettings.churchWidth, 0)));
-		gameState.addObject(new Bomb(new Point2D.Double(250, 480)));
 	}
 
 	/** Startet Spiel zum ersten Mal. */
@@ -67,7 +67,7 @@ public class GameController {
 		bombCreatorThread = new BombCreatorThread();
 		gameManagementThread.start();
 		bombCreatorThread.start();
-		gameState.addObject(new Player(new Point2D.Double(250, 250)));
+		gameState.addObject(new Player(new Point2D.Double(250, 150)));
 		gameState.setGameActive(true);
 	}
 
@@ -95,38 +95,29 @@ public class GameController {
 	}
 
 	private class BombCreatorThread extends Thread {
-		Vector<Bomb> bombList = new Vector<Bomb>();
 
 		public void run() {
 
-			int wait = GameSettings.bombCreatorStartPause
-					- ((gameState.getLevel() - 1) * GameSettings.bombCreatorDecreaseNumber);
-			wait = wait < GameSettings.bombCreatorMinPause ? GameSettings.bombCreatorMinPause : wait;
+			while (GameController.getInstance().getGameState().isGameActive()) {
 
-			try {
-				this.wait((long)wait);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			int pos = (int) (Math.random() * GameSettings.gamePanelWidth);
+				int wait = GameSettings.bombCreatorStartPause
+						- ((gameState.getLevel() - 1) * GameSettings.bombCreatorDecreaseNumber);
+				wait = wait < GameSettings.bombCreatorMinPause ? GameSettings.bombCreatorMinPause : wait;
 
-			Bomb bomb = new Bomb(pos);
-			bombList.add(bomb);
-			gameState.getObjectList().add(bomb);
+				try {
+					Thread.sleep((long) wait);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 
-			for (Bomb b : bombList) {
-				b.drop(10);
+				}
+				int pos = (int) (Math.random() * GameSettings.gamePanelWidth);
+
+				Bomb bomb = new Bomb(new Point2D.Double(pos, 500));
+				gameState.addObject(bomb);
+				bomb.start();
 			}
 		}
 
-		/*
-		 * TODO Die Run-Methode der Klasse soll Bomb-Objekte an einer
-		 * zufaelligen Stelle am oberen Rand des Gamepanels in einem
-		 * vorgegebenen Zeitintervall abhaengig vom aktuellen Level generieren.
-		 * Mit ansteigendem Level sollen die Pausenintervalle in konstanten
-		 * Schritten bis zu einer vorgegeben Mindestgrenze abnehmen (siehe
-		 * Klasse GameSettings).
-		 */
 	}
 
 	private class GameManagementThread extends Thread {
@@ -149,25 +140,21 @@ public class GameController {
 			while (true) {
 				if (gameState.isGameActive()) {
 
-					/*for (GameObject x : gameState.getObjectList()) {
-						
-						for (GameObject y : gameState.getObjectList()) {
-							
-							if (!x.equals(y) && x.collide(y)) {
-								System.out.println("halo");
-							}
-
-						}
-					}*/
+					/*
+					 * for (GameObject x : gameState.getObjectList()) {
+					 * 
+					 * for (GameObject y : gameState.getObjectList()) {
+					 * 
+					 * if (!x.equals(y) && x.collide(y)) {
+					 * System.out.println("halo"); }
+					 * 
+					 * } }
+					 */
 				}
 			}
 
-		
-		
 		}
-		
-		
-		
+
 	}
 
 }

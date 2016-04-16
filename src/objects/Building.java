@@ -1,49 +1,70 @@
 package objects;
 
 import java.awt.Color;
+import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 
-public class Building extends GameObject implements Damageable, Scoreable {
+import game.GameSettings;
 
+public class Building extends GameObject implements Damageable, Scoreable {
+	double[] xCoord, yCoord;
+	int houseW, houseH;
+	
 
 	public Building(BuildingType type, Point2D.Double p2d) {
-		this.polygon = type.polygon;
 		this.position = p2d;
+
 		switch (type) {
 		case BLUEHOUSE:
 			this.color = Color.BLUE;
+			xCoord = GameSettings.houseBluePolygonXValues;
+			yCoord = GameSettings.houseBluePolygonYValues;
+			houseW = GameSettings.houseBlueWidth;
+			houseH = GameSettings.houseBlueHeight;
+
 			break;
 		case REDHOUSE:
 			this.color = Color.RED;
+			xCoord = GameSettings.houseRedPolygonXValues;
+			yCoord = GameSettings.houseRedPolygonYValues;
+			houseW = GameSettings.houseRedWidth;
+			houseH = GameSettings.houseRedHeight;
+			
 			break;
 		case YELLOWHOUSE:
 			this.color = Color.YELLOW;
+			xCoord = GameSettings.houseYellowPolygonXValues;
+			yCoord = GameSettings.houseYellowPolygonYValues;
+			houseW = GameSettings.houseYellowWidth;
+			houseH = GameSettings.houseYellowHeight;
 			break;
 		case CHURCH:
 			this.color = Color.GREEN;
+			xCoord = GameSettings.churchPolygonXValues;
+			yCoord = GameSettings.churchPolygonYValues;
+			houseW = GameSettings.churchWidth;
+			houseH = GameSettings.churchHeight;
+			
 			break;
 		
 
 		}
+		initPolygon();
 	}
 	
-	/*private void setChurch() {
-		
+	public void initPolygon(){
+		int[] xC = new int[xCoord.length];
+		int[] yC = new int[yCoord.length];
+		for (int i = 0; i < xCoord.length; i++) {
+			xC[i] = (int) (((xCoord[i] * houseW)) + position.getX());
+			yC[i] = (int) ((yCoord[i] * -houseH) + position.getY());
+		}
+		polygon = new Polygon(xC, yC, xC.length);
+	
 	}
 
-	private void setYellowHouse() {
-
-	}
-
-	private void setRedHouse() {
-
-	}
-
-	private void setBlueHouse() {
-
-	}*/
 
 	@Override
 	public int getScore() {
@@ -86,6 +107,10 @@ public class Building extends GameObject implements Damageable, Scoreable {
 	@Override
 	public boolean outOfView() {
 		return false;
+	}
+	
+	public void run(){
+		
 	}
 
 }

@@ -1,43 +1,51 @@
 package objects;
 
+import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
+import java.util.Vector;
 
 import game.GameController;
 import game.GameSettings;
 
-public class Player extends GameObject implements Damageable{
-	
-	public  Player(Point2D.Double double1){
-		position = double1;
-		initPolygon();
-	
+public class Player extends GameObject implements Damageable {
+	boolean right;
+
+	public Player(Point2D.Double double1) {
+		this.position = double1;
+		this.right = true;
+		this.color = Color.BLACK;
+		this.dX = 10;
+		this.dY = 10;
+		initPolygon(true);
+
+
 	}
-	
-	public void initPolygon(){
+
+	public void initPolygon(boolean right) {
 		int[] xC = new int[GameSettings.playerPolygonXValues.length];
 		int[] yC = new int[GameSettings.playerPolygonYValues.length];
-
-	for (int i = 0; i < GameSettings.playerPolygonXValues.length; i++) {
-			xC[i] = (int)(GameSettings.playerPolygonXValues[i]*GameSettings.playerWidth);
-			yC[i] = (int)(GameSettings.playerPolygonYValues[i]*-GameSettings.playerHeight);
+		int z = right ? 1 : -1;
+		for (int i = 0; i < GameSettings.playerPolygonXValues.length; i++) {
+			xC[i] = (int) (((GameSettings.playerPolygonXValues[i] * GameSettings.playerWidth) * z) + position.getX());
+			yC[i] = (int) ((GameSettings.playerPolygonYValues[i] * -GameSettings.playerHeight) + position.getY());
 		}
-	polygon = new Polygon(xC, yC, xC.length);
+		polygon = new Polygon(xC, yC, xC.length);
 	}
-	
+
 	@Override
 	public void increaseDamage(int damage) {
-		
+
 	}
 
 	@Override
 	public void generateExplosion() {
-		
+
 	}
 
 	@Override
 	public void setSilent(boolean silent) {
-		
+
 	}
 
 	@Override
@@ -48,30 +56,62 @@ public class Player extends GameObject implements Damageable{
 
 	@Override
 	public void flipPolygonHorizontally() {
-		// TODO Auto-generated method stub
-		
+
+		right = !right;
+		initPolygon(right);
+
 	}
 
 	@Override
 	public boolean outOfView() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+		double x = position.getX();
+		return x>450.0 || x<0;	
+		}
+
 
 	public void moveLeft() {
-		position.x = position.getX()-10;
+		System.out.print("LINKS: von " + position.getX());
+
+		if (right) {
+			flipPolygonHorizontally();
+
+			position.setLocation(position.getX() + polygon.getBounds().getWidth(), position.getY());
+		}
+		if (position.getX()>60) {
+
+			position = new Point2D.Double(position.getX() - dX, position.getY());
+			System.out.println(" nach " + position.getX());
+		}else{ System.out.println(" Am linken Rand");
+		}
+		initPolygon(right);
+
 	}
-	
-	public void moveRight(){
-		position.x = position.getX()-10;
+
+	public void moveRight() {
+		System.out.print("RECHTS: von " + position.getX());
+		if (!right) {
+			flipPolygonHorizontally();
+			position.setLocation(position.getX() - polygon.getBounds().getWidth(), position.getY());
+		}
+		if (position.getX()<390) {
+
+			position = new Point2D.Double(position.getX() + dX, position.getY());
+			System.out.println(" nach " + position.getX());
+		}else{
+			System.out.println(" Am rechten Rand");
+		}
+		initPolygon(right);
 
 	}
 
 	public void shoot() {
-		Bomb b = new Bomb(position);
-		GameController.getInstance().getGameState().addObject(b);
+		Vector<GameObject> go = (Vector<GameObject>) GameController.getInstance().getGameState().getObjectList().clone();
+		go.add(new Bullet(new Point2D.Double(position.getX(), position.getY())));
+		GameController.getInstance().getGameState().setObjectList(go);
 	}
 
-	
+	public void run() {
+
+	}
 
 }

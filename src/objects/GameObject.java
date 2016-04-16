@@ -63,12 +63,12 @@ public abstract class GameObject extends Thread implements Explosive {
 	 * @param graphics2D Graphics2D
 	 * */
 	public void draw(Graphics2D graphics2D) {
-		graphics2D.translate(position.x, position.y);
+		//graphics2D.translate(position.x, position.y);
 		graphics2D.setColor(this.color);
 		graphics2D.fill(this.polygon);
 		graphics2D.setColor(Color.black);
 		graphics2D.draw(this.polygon);
-		graphics2D.translate(-position.x, -position.y);
+		//graphics2D.translate(-position.x, -position.y);
 
 	}
 	
@@ -112,5 +112,7 @@ public abstract class GameObject extends Thread implements Explosive {
 	public boolean isGameRelevant() {
 		return this.gameRelevant;
 	}
+	
+	
 		
 }

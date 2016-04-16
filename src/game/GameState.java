@@ -27,10 +27,7 @@ public class GameState {
 		this.gameActive = false;
 		this.score = 0;
 		this.level = 1;
-		player = new Player(new Point2D.Double(250,250));
-		if(!objectList.contains(player)){
-			objectList.add(0, player);
-		}
+	
 	}
 
 	public boolean isGameActive() {
@@ -41,7 +38,7 @@ public class GameState {
 		this.gameActive = gameActive;
 	}
 
-	public Vector<GameObject> getObjectList() {
+	synchronized public Vector<GameObject> getObjectList() {
 		return objectList;
 	}
 
@@ -75,7 +72,8 @@ public class GameState {
 	}
 
 	public Player getPlayer() {
-		return player;
+					
+		return (Player) objectList.get(0);
 	}
 	
 }
