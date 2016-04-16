@@ -1,8 +1,9 @@
 package objects;
 
-public class Explosion {
+//import java.awt.Image;
 
-	
+public class Explosion {
+	//private Image picture;
 	
 
 }

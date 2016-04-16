@@ -3,33 +3,31 @@ package objects;
 import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.geom.Point2D.Double;
-
-import game.GameController;
-
 public class Bullet extends GameObject implements Damageable, Damaging{
 
 	public Bullet(Double position) {
 		this.position = position;
 		initPolygon();
-		this.color = Color.DARK_GRAY;
+		this.color = Color.ORANGE;
 		this.dY = 5;
+		//System.out.println("new Bullet at: " + this.position.getX());
 		this.start();
-		System.out.println("new Bullet at: " + this.position.getX());
-		GameController.getInstance().getGameState().addObject(this);
 	}
 
 	private void initPolygon() {
-		polygon = new Polygon();
-		polygon.addPoint(0, 0);
-		polygon.addPoint(5, 0);
-		polygon.addPoint(5, 5);
-		polygon.addPoint(0, 5);
+		Polygon zpolygon = new Polygon();
+		
+		zpolygon.addPoint((int)(0 + position.getX()),(int)( 0+ position.getY()));
+		zpolygon.addPoint((int)(0 + position.getX()),(int)( 5+ position.getY()));
+		zpolygon.addPoint((int)(5 + position.getX()),(int)( 5+ position.getY()));
+		zpolygon.addPoint((int)(5 + position.getX()),(int)( 0+ position.getY()));
+		this.polygon = zpolygon;
 	}
 
 	@Override
 	public int getCausingDamage() {
 		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	@Override
@@ -64,8 +62,8 @@ public class Bullet extends GameObject implements Damageable, Damaging{
 
 	@Override
 	public boolean outOfView() {
-		// TODO Auto-generated method stub
-		return false;
+		
+		return position.getX()>500;
 	}
 	public void run(){
 		while(this.isActive()){
@@ -77,10 +75,14 @@ public class Bullet extends GameObject implements Damageable, Damaging{
 		}
 		this.travel();
 		}
+		if(outOfView()){
+			this.setActive(false);
+		}
 	}
 
 	private void travel() {
 		this.position.setLocation(position.getX(), position.getY()+dY);
+		initPolygon();
 	}
 
 }

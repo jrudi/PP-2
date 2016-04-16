@@ -1,10 +1,8 @@
 package game;
 
-import java.awt.geom.Point2D;
 import java.util.Vector;
 
 import objects.GameObject;
-import objects.Player;
 
 
 public class GameState {
@@ -20,7 +18,9 @@ public class GameState {
 	/** Aktuelles Level. Je hoeher das Level, desto weiter fortgeschritten das Spiel und desto kuerzer die Pausenzeiten zwischen der Generierung 
 	 * neuer Bomb-Objekte des bombCreatorThreads. */
 	private int level;
-	private Player player;
+	private int lives;
+	private boolean polygonOnly;
+	private long levelTime;
 	
 	public GameState () {
 		this.objectList = new Vector<GameObject>();
@@ -47,8 +47,7 @@ public class GameState {
 	}
 	
 	public void addObject(GameObject go){
-		if(go instanceof Player) this.objectList.add(0,go);
-		else this.objectList.addElement(go);
+		this.objectList.addElement(go);
 	}
 	
 	public void removeObject(GameObject go){
@@ -71,9 +70,29 @@ public class GameState {
 		this.level = level;
 	}
 
-	public Player getPlayer() {
-					
-		return (Player) objectList.get(0);
+	public void setPolygonOnly(boolean b) {
+		this.polygonOnly = b;
+		
+	}
+	public boolean getPolygonOnly(){
+		return polygonOnly;
+	}
+
+	public long getLevelTime() {
+		return levelTime;
+	}
+
+	public void setLevelTime(long levelTime) {
+		this.levelTime = levelTime;
+	}
+
+	public void setLife(int lifePoints) {
+		lives = lifePoints;
+	}
+
+	public int getLife() {
+		
+		return lives;
 	}
 	
 }

@@ -2,8 +2,11 @@ package objects;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
+
+import game.GameController;
 
 public abstract class GameObject extends Thread implements Explosive {
 
@@ -32,12 +35,13 @@ public abstract class GameObject extends Thread implements Explosive {
 	/** Positionsverschiebung in X- und Y-Richtung bei jeder Bewegung */
 	protected double dX, dY;
 	
+	protected Image picture;
+	
 	
 	public GameObject () {
 		this.damage = 0;
 		this.active = true;
 		this.gameRelevant = false;
-		this.position = new Point2D.Double(40.0,40.0);
 	}
 	
 	/**
@@ -63,13 +67,18 @@ public abstract class GameObject extends Thread implements Explosive {
 	 * @param graphics2D Graphics2D
 	 * */
 	public void draw(Graphics2D graphics2D) {
-		//graphics2D.translate(position.x, position.y);
 		graphics2D.setColor(this.color);
 		graphics2D.fill(this.polygon);
 		graphics2D.setColor(Color.black);
 		graphics2D.draw(this.polygon);
-		//graphics2D.translate(-position.x, -position.y);
-
+		
+		if(!GameController.getInstance().getGameState().getPolygonOnly()){
+		if(this instanceof Player &&!((Player)this).isRight()){
+			graphics2D.drawImage(picture, (int)position.getX()-width, (int)position.getY()+height, width, -height, null);
+			}else{
+				graphics2D.drawImage(picture, (int)position.getX(), (int)position.getY()+height, width, -height, null);
+			}
+		}
 	}
 	
 	/**
@@ -77,7 +86,7 @@ public abstract class GameObject extends Thread implements Explosive {
 	 * Garbage Collector geloescht.
 	 * @param active boolean
 	 * */
-	public void setActive(boolean active) {
+	synchronized public void setActive(boolean active) {
 		this.active = active;
 	}
 	

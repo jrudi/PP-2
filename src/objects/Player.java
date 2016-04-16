@@ -1,23 +1,30 @@
 package objects;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
-import java.util.Vector;
 
 import game.GameController;
 import game.GameSettings;
+import io.ImageLoader;
 
 public class Player extends GameObject implements Damageable {
-	boolean right;
+	private boolean right;
+	Image playerLeft,playerRight;
 
 	public Player(Point2D.Double double1) {
 		this.position = double1;
 		this.right = true;
+		this.maximumDamage = 4;
 		this.color = Color.BLACK;
-		this.dX = 10;
-		this.dY = 10;
+		this.dX = GameSettings.playerDX;
+		this.height = GameSettings.playerHeight;
+		this.width = GameSettings.playerWidth;
+		playerLeft = ImageLoader.getPlayerLookingToLeftImage(GameSettings.gamePanelWidth, GameSettings.playerHeight);
+		playerRight = ImageLoader.getPlayerLookingToRightImage(GameSettings.gamePanelWidth, GameSettings.playerHeight);
 		initPolygon(true);
+
 
 
 	}
@@ -31,11 +38,16 @@ public class Player extends GameObject implements Damageable {
 			yC[i] = (int) ((GameSettings.playerPolygonYValues[i] * -GameSettings.playerHeight) + position.getY());
 		}
 		polygon = new Polygon(xC, yC, xC.length);
+		this.picture = right? playerRight:playerLeft;
 	}
 
 	@Override
 	public void increaseDamage(int damage) {
-
+		this.damage +=damage;
+	}
+	
+	public boolean isRight(){
+		return this.right;
 	}
 
 	@Override
@@ -70,7 +82,7 @@ public class Player extends GameObject implements Damageable {
 
 
 	public void moveLeft() {
-		System.out.print("LINKS: von " + position.getX());
+		//System.out.print("LINKS: von " + position.getX());
 
 		if (right) {
 			flipPolygonHorizontally();
@@ -80,15 +92,16 @@ public class Player extends GameObject implements Damageable {
 		if (position.getX()>60) {
 
 			position = new Point2D.Double(position.getX() - dX, position.getY());
-			System.out.println(" nach " + position.getX());
-		}else{ System.out.println(" Am linken Rand");
+			//System.out.println(" nach " + position.getX());
+		}else{
+			//System.out.println(" Am linken Rand");
 		}
 		initPolygon(right);
 
 	}
 
 	public void moveRight() {
-		System.out.print("RECHTS: von " + position.getX());
+		//System.out.print("RECHTS: von " + position.getX());
 		if (!right) {
 			flipPolygonHorizontally();
 			position.setLocation(position.getX() - polygon.getBounds().getWidth(), position.getY());
@@ -96,18 +109,18 @@ public class Player extends GameObject implements Damageable {
 		if (position.getX()<390) {
 
 			position = new Point2D.Double(position.getX() + dX, position.getY());
-			System.out.println(" nach " + position.getX());
+			//System.out.println(" nach " + position.getX());
 		}else{
-			System.out.println(" Am rechten Rand");
+			//System.out.println(" Am rechten Rand");
 		}
 		initPolygon(right);
 
 	}
 
 	public void shoot() {
-		Vector<GameObject> go = (Vector<GameObject>) GameController.getInstance().getGameState().getObjectList().clone();
-		go.add(new Bullet(new Point2D.Double(position.getX(), position.getY())));
-		GameController.getInstance().getGameState().setObjectList(go);
+		Bullet b = new Bullet(new Point2D.Double(position.getX(),position.getY()));
+		GameController.getInstance().getGameState().getObjectList().add(b);
+		b.start();
 	}
 
 	public void run() {

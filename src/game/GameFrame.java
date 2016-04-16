@@ -4,9 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
 import java.util.Vector;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.*;
 import objects.*;
@@ -22,7 +20,7 @@ public class GameFrame extends JFrame {
 	private JButton startButton;
 	/** Pause- und Fortsetzen-Button */
 	private JButton pauseButton;
-
+	private JButton switchButton;
 	/** Anzeige der verbleibenden Lebenspunkte der Spielfigur */
 	private JLabel lifePoints;
 	/** Anzeige des aktuellen Levels */
@@ -30,6 +28,7 @@ public class GameFrame extends JFrame {
 	/** Anzeige der bisher gesammelten Punkte */
 	private JLabel score;
 	private RepainterThread repainterThread;
+	private GameFrameUpdater gfu;
 
 	public GameFrame() {
 
@@ -39,6 +38,7 @@ public class GameFrame extends JFrame {
 		Container c = getContentPane();
 		gamePanel = new GamePanel();
 		repainterThread = new RepainterThread();
+		gfu = new GameFrameUpdater();
 		c.add(gamePanel, BorderLayout.CENTER);
 		c.add(createButtonPanel(), BorderLayout.SOUTH);
 
@@ -61,6 +61,22 @@ public class GameFrame extends JFrame {
 	 */
 	public JPanel createButtonPanel() {
 		JPanel panel = new JPanel();
+		this.switchButton = new JButton("Polygone");
+		this.switchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JButton b = (JButton) e.getSource();
+				switch (b.getText()) {
+				case "Polygone":
+					GameController.getInstance().getGameState().setPolygonOnly(true);
+					b.setText("Bilder");
+					break;
+				case "Bilder":
+					GameController.getInstance().getGameState().setPolygonOnly(false);
+					b.setText("Polygone");
+					break;
+				}
+			}
+		});
 
 		this.startButton = new JButton("Start");
 		this.startButton.addActionListener(new ActionListener() {
@@ -69,6 +85,8 @@ public class GameFrame extends JFrame {
 				if (!repainterThread.isAlive()) {
 
 					repainterThread.start();
+					gfu.start();
+					
 				}
 			}
 		});
@@ -81,22 +99,29 @@ public class GameFrame extends JFrame {
 				if (jButton.getText().equals("Anhalten")) {
 					jButton.setText("Fortsetzen");
 					GameController.getInstance().getGameState().setGameActive(false);
-					GameController.getInstance().endGame();
+					long stoptime = GameController.getInstance().getGameState().getLevelTime() - System.currentTimeMillis();
+					GameController.getInstance().getGameState().setLevelTime(stoptime);
+					//GameController.getInstance().endGame();
 
 				} else if (jButton.getText().equals("Fortsetzen")) {
 					jButton.setText("Anhalten");
 					GameController.getInstance().getGameState().setGameActive(true);
+					long starttime = GameController.getInstance().getGameState().getLevelTime() + System.currentTimeMillis();
+
+					GameController.getInstance().getGameState().setLevelTime(starttime);
+
 				}
 			}
 		});
 
 		lifePoints = new JLabel();
-		lifePoints.setText("Leben: -"); // TODO
+		lifePoints.setText("Leben: -");
 		level = new JLabel();
-		level.setText("Level: -"); // TODO
+		level.setText("Level: -");
 		score = new JLabel();
-		score.setText("Punkte -"); // TODO
+		score.setText("Punkte -");
 
+		panel.add(switchButton);
 		panel.add(startButton);
 		panel.add(pauseButton);
 		panel.add(lifePoints);
@@ -140,11 +165,11 @@ public class GameFrame extends JFrame {
 			setPreferredSize(new Dimension(width, height));
 
 			// Listener zu testzwecken, zeigt mausposition an
-//			this.addMouseListener(new MouseAdapter() {
-//				public void mouseClicked(MouseEvent e) {
-//					System.out.println("X: " + e.getX() + "Y: " + e.getY());
-//				}
-//			});
+			// this.addMouseListener(new MouseAdapter() {
+			// public void mouseClicked(MouseEvent e) {
+			// System.out.println("X: " + e.getX() + "Y: " + e.getY());
+			// }
+			// });
 
 			this.setFocusable(true);
 
@@ -165,10 +190,14 @@ public class GameFrame extends JFrame {
 			graphics2D.setTransform(FLIP_X_COORD);
 			graphics2D.setColor(GameSettings.gamePanelBackgroundColor);
 			graphics2D.fillRect(0, 0, width, height);
+			@SuppressWarnings("unchecked")
+			Vector<GameObject> clone = (Vector<GameObject>) GameController.getInstance().getGameState().getObjectList()
+					.clone();
+			for (GameObject x : clone) {
+				if (x.isActive()) {
 
-			for (GameObject x : GameController.getInstance().getGameState().getObjectList()) {
-				x.draw(graphics2D);
-
+					x.draw(graphics2D);
+				}
 			}
 		}
 
@@ -208,6 +237,7 @@ public class GameFrame extends JFrame {
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					GameOverFrame.this.dispose();
+					GameController.getInstance().restartGame();
 				}
 			});
 
@@ -232,12 +262,13 @@ public class GameFrame extends JFrame {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
+			@SuppressWarnings("unchecked")
 			Vector<GameObject> oL = (Vector<GameObject>) GameController.getInstance().getGameState().getObjectList()
 					.clone();
 
 			if (GameController.getInstance().getGameState().isGameActive()) {
 				Player p = new Player(new Point2D.Double(10, 10));
-				for (GameObject x :GameController.getInstance().getGameState().getObjectList()){
+				for (GameObject x : GameController.getInstance().getGameState().getObjectList()) {
 					if (x instanceof Player) {
 						p = (Player) x;
 						oL.remove(x);
@@ -252,7 +283,13 @@ public class GameFrame extends JFrame {
 					p.moveRight();
 					break;
 				case KeyEvent.VK_UP:
-					p.shoot();
+					int x = (int) p.getPosition().getX();
+					x = p.isRight()?x+p.getWidth():x-p.getWidth();
+					int y = (int) (p.getPosition().getY()+10);
+					Bullet b = new Bullet(new Point2D.Double(x,y));
+					oL.add(b);
+					if(!b.isAlive()) b.start();
+					
 				default:
 					break;
 				}
@@ -263,28 +300,29 @@ public class GameFrame extends JFrame {
 		}
 	}
 
-		private class RepainterThread extends Thread {
-			// TODO Run-Methode soll das GamePanel in kurzen Abstaenden neu
-			// zeichen.
-			public void run() {
-				
-				while (GameController.getInstance().getGameState().isGameActive()) {
-					try{
-						Thread.sleep(10);
-					}catch (InterruptedException ie){
-						ie.printStackTrace();
-					}
-					repaintGamePanel();
-					gamePanel.setFocusable(true);
-					gamePanel.requestFocus();
-				}
-			}
+	private class RepainterThread extends Thread {
+		// TODO Run-Methode soll das GamePanel in kurzen Abstaenden neu
+		// zeichen.
+		public void run() {
 
+			while (GameController.getInstance().getGameState().isGameActive()) {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException ie) {
+					ie.printStackTrace();
+				}
+				repaintGamePanel();
+				gamePanel.setFocusable(true);
+				gamePanel.requestFocus();
+			}
 		}
 
-		private class GameFrameUpdater extends Thread {
+	}
 
-			public void run() {
+	private class GameFrameUpdater extends Thread {
+
+		public void run() {
+			while (GameController.getInstance().getGameState().isGameActive()) {
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException ie) {
@@ -297,11 +335,11 @@ public class GameFrame extends JFrame {
 				long currentScore = GameController.getInstance().getGameState().getScore();
 				score.setText("Score: " + currentScore);
 
-				// int currentLife =
-				// GameController.getInstance().getGameState().getLife();
-				// lifePoints.setText("Leben: "+ currentLife);
+				 int currentLife = GameController.getInstance().getGameState().getLife();
+				lifePoints.setText("Leben: "+ currentLife);
 
 			}
 		}
-	
+	}
+
 }

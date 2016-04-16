@@ -17,12 +17,12 @@ public class ImageLoader {
 	private static Image bombImage;
 	private static Image bigExplosionImage;
 	private static Image explosionImage;
-	private static Image cloudImage;
+	//sprivate static Image cloudImage;
 	private static Image blueHouseImage;
 	private static Image redHouseImage;
 	private static Image yellowHouseImage;
 	private static Image churchImage;
-	private static Image fireImage;
+	//private static Image fireImage;
 	
 	
 	public static Image getPlayerLookingToRightImage (int width, int height) {
