@@ -16,7 +16,7 @@ public class Building extends GameObject implements Damageable, Scoreable {
 
 	public Building(BuildingType type, Point2D.Double p2d, boolean b) {
 		this.position = p2d;
-		this.maximumDamage = 3;
+		this.maximumDamage = 4;
 
 		switch (type) {
 		case BLUEHOUSE:
@@ -28,6 +28,8 @@ public class Building extends GameObject implements Damageable, Scoreable {
 			height = GameSettings.houseBlueHeight;
 			picture = ImageLoader.getBlueHouseImage(width, height);
 			score = 20;
+			maximumDamage = GameSettings.houseBlueMaxDamage;
+
 
 			break;
 		case REDHOUSE:
@@ -38,6 +40,8 @@ public class Building extends GameObject implements Damageable, Scoreable {
 			height = GameSettings.houseRedHeight;
 			picture = ImageLoader.getRedHouseImage(width, height);
 			score = 40;
+			maximumDamage = GameSettings.houseRedMaxDamage;
+
 			
 			break;
 		case YELLOWHOUSE:
@@ -48,6 +52,8 @@ public class Building extends GameObject implements Damageable, Scoreable {
 			height = GameSettings.houseYellowHeight;
 			picture = ImageLoader.getYellowHouseImage(width, height);
 			score = 35;
+			maximumDamage = GameSettings.houseYellowMaxDamage;
+
 			break;
 		case CHURCH:
 			this.color = Color.GREEN;
@@ -57,6 +63,7 @@ public class Building extends GameObject implements Damageable, Scoreable {
 			height = GameSettings.churchHeight;
 			picture = ImageLoader.getChurchImage(width, height);
 			score = 100;
+			maximumDamage = GameSettings.churchMaxDamage;
 			
 			break;
 		
@@ -84,8 +91,10 @@ public class Building extends GameObject implements Damageable, Scoreable {
 
 	@Override
 	public void generateExplosion() {
-		// TODO Auto-generated method stub
-
+		Explosion e = new Explosion(Explosion.BIG, this.height, this.width,new Point2D.Double(position.getX(),position.getY()));
+		e.setActive(true);
+		GameController.getInstance().getGameState().addObject(e);
+		
 	}
 
 	@Override

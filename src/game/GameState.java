@@ -2,6 +2,7 @@ package game;
 
 import java.util.Vector;
 
+import objects.Building;
 import objects.GameObject;
 
 
@@ -21,9 +22,12 @@ public class GameState {
 	private int lives;
 	private boolean polygonOnly;
 	private long levelTime;
+	private Vector<Building> houseList;
 	
 	public GameState () {
 		this.objectList = new Vector<GameObject>();
+		this.houseList = new Vector<Building>();
+
 		this.gameActive = false;
 		this.score = 0;
 		this.level = 1;
@@ -53,6 +57,9 @@ public class GameState {
 	
 	public void removeObject(GameObject go){
 		this.objectList.remove(go);
+		if(go instanceof Building){
+			this.houseList.remove(go);
+		}
 	}
 
 	public long getScore() {
@@ -94,6 +101,14 @@ public class GameState {
 	public int getLife() {
 		
 		return lives;
+	}
+
+	public Vector<Building> getHouseList() {
+		return houseList;
+	}
+
+	public void setHouseList(Vector<Building> houseList) {
+		this.houseList = houseList;
 	}
 	
 }

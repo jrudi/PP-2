@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.geom.Point2D;
 
+import game.GameController;
 import game.GameSettings;
 import io.ImageLoader;
 
@@ -51,6 +52,9 @@ public class Player extends GameObject implements Damageable {
 
 	@Override
 	public void generateExplosion() {
+		Explosion e = new Explosion(Explosion.SMALL, this.height, this.width,new Point2D.Double(position.getX(),position.getY()));
+		e.setActive(true);
+		GameController.getInstance().getGameState().addObject(e);
 
 	}
 

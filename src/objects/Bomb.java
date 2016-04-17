@@ -8,7 +8,7 @@ import game.*;
 import io.ImageLoader;
 
 public class Bomb extends GameObject implements Damaging {
-
+	
 	public Bomb(Point2D.Double double1) {
 		this.position = double1;
 		initPolygon();
@@ -37,8 +37,7 @@ public class Bomb extends GameObject implements Damaging {
 
 	@Override
 	public void generateExplosion() {
-		System.out.println("peng");
-
+	
 	}
 
 	@Override
@@ -52,21 +51,23 @@ public class Bomb extends GameObject implements Damaging {
 		Area a = new Area(this.polygon);
 		Area b = new Area(gameObjectToCheck.polygon);
 		a.intersect(b);
-		if (!a.isEmpty()&&this.isActive()) {
+		if (!a.isEmpty()&&this.isActive()&&gameObjectToCheck.isActive()) {
 			this.setActive(false);
-//			gameObjectToCheck.setActive(false);
 			GameController.getInstance().getGameState().getObjectList().remove(this);
 
 			if (gameObjectToCheck instanceof Bullet) {
+				
 				gameObjectToCheck.setActive(false);
-				GameController.getInstance().getGameState().getObjectList().remove(gameObjectToCheck);
+				GameController.getInstance().getGameState().removeObject(gameObjectToCheck);
 
 			} else if (gameObjectToCheck instanceof Building) {
 				Building y = (Building) gameObjectToCheck;
 				y.increaseDamage(this.getCausingDamage());
-				if (y.getLifePoints() <= 0) {
+				if (y.getLifePoints() == -1) {
+					gameObjectToCheck.generateExplosion();
 					gameObjectToCheck.setActive(false);
-					GameController.getInstance().getGameState().getObjectList().remove(gameObjectToCheck);
+					GameController.getInstance().getGameState().removeObject(gameObjectToCheck);
+
 					if(y.isGameRelevant()){
 						GameController.getInstance().endGame();
 					}
@@ -79,6 +80,7 @@ public class Bomb extends GameObject implements Damaging {
 
 				if (y.getLifePoints() <= 0) {
 					gameObjectToCheck.setActive(false);
+					gameObjectToCheck.generateExplosion();
 					GameController.getInstance().getGameState().getObjectList().remove(gameObjectToCheck);
 					GameController.getInstance().endGame();
 					System.out.println(y.getLifePoints());
@@ -112,13 +114,13 @@ public class Bomb extends GameObject implements Damaging {
 	}
 
 	public void run() {
-		while (this.isActive()) {
+		while (GameController.getInstance().getGameState().isGameActive()&&this.isActive()) {
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException ie) {
 				ie.printStackTrace();
 			}
-			this.drop(0.5);
+			this.drop(2.5);
 			if (this.outOfView()) {
 				this.setActive(false);
 				GameController.getInstance().getGameState().getObjectList().remove(this);

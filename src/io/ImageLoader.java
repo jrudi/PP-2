@@ -17,7 +17,7 @@ public class ImageLoader {
 	private static Image bombImage;
 	private static Image bigExplosionImage;
 	private static Image explosionImage;
-	//sprivate static Image cloudImage;
+	private static Image cloudImage;
 	private static Image blueHouseImage;
 	private static Image redHouseImage;
 	private static Image yellowHouseImage;
@@ -122,6 +122,17 @@ public class ImageLoader {
 			}
 		}
 		return churchImage.getScaledInstance(width, height, SCALE_SMOOTH);
+	}
+	
+	public static Image getCloudImage (int width, int height) {
+		if( cloudImage == null) {
+			try {
+				cloudImage = ImageIO.read(new File("resources/img/cloud.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return cloudImage.getScaledInstance(width, height, SCALE_SMOOTH);
 	}
 
 }

@@ -73,10 +73,25 @@ public abstract class GameObject extends Thread implements Explosive {
 		graphics2D.draw(this.polygon);
 		
 		if(!GameController.getInstance().getGameState().getPolygonOnly()){
-		if(this instanceof Player &&!((Player)this).isRight()){
-			graphics2D.drawImage(picture, (int)position.getX()-width, (int)position.getY()+height, width, -height, null);
+			if(this instanceof Player &&!((Player)this).isRight()){
+				graphics2D.drawImage(picture, (int)position.getX()-width, (int)position.getY()+height, width, -height, null);
 			}else{
 				graphics2D.drawImage(picture, (int)position.getX(), (int)position.getY()+height, width, -height, null);
+				if(this instanceof Explosion){
+					Explosion e = (Explosion)this;
+					System.out.println("Explosion gefunden bei" + e.position + " Größe: " + height + " x " + width +"  " + e.count);
+					//e.decreaseCount();
+					//if(e.getCount()<0){
+					//	GameController.getInstance().getGameState().removeObject(e);
+				//	}
+					//if(((Explosion) this).count<1){
+						//System.out.println(((Explosion)this).count + " kleiner 0");
+						//this.setActive(false);
+						//GameController.getInstance().getGameState().removeObject(this);
+					//}
+
+					
+				}
 			}
 		}
 	}

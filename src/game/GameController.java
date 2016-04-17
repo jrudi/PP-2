@@ -22,7 +22,7 @@ public class GameController {
 	 * Schadensberechnung sowie Levelverwaltung)
 	 */
 	private GameManagementThread gameManagementThread;
-	private long start = System.currentTimeMillis();
+	private long currentBombTime = GameSettings.bombCreatorStartPause;
 
 	public static GameController getInstance() {
 		if (instance == null) {
@@ -38,7 +38,6 @@ public class GameController {
 	 */
 	public void initiate() {
 		this.gameFrame = new GameFrame();
-		startGame();
 
 	}
 
@@ -50,17 +49,24 @@ public class GameController {
 	 * gesetzt.
 	 */
 	public void createTown() {
-		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(0, 0), true));
-		gameState.addObject(
-				new Building(BuildingType.REDHOUSE, new Point2D.Double(GameSettings.houseBlueWidth, 0), false));
-		gameState.addObject(new Building(BuildingType.YELLOWHOUSE,
-				new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth, 0), false));
-		gameState.addObject(new Building(BuildingType.CHURCH,
+		Building b1 = new Building(BuildingType.BLUEHOUSE, new Point2D.Double(0, 0), true);
+		Building b2 = new Building(BuildingType.REDHOUSE, new Point2D.Double(GameSettings.houseBlueWidth, 0), false);
+		Building b3 = new Building(BuildingType.YELLOWHOUSE,
+				new Point2D.Double(GameSettings.houseBlueWidth + GameSettings.houseRedWidth, 0), false);
+		Building b4 = new Building(BuildingType.CHURCH,
 				new Point2D.Double(
 						GameSettings.houseBlueWidth + GameSettings.houseRedWidth + GameSettings.houseYellowWidth, 0),
-				false));
-		gameState.addObject(new Building(BuildingType.BLUEHOUSE, new Point2D.Double(GameSettings.houseBlueWidth
-				+ GameSettings.houseRedWidth + GameSettings.houseYellowWidth + GameSettings.churchWidth, 0), true));
+				false);
+		Building b5 = new Building(BuildingType.BLUEHOUSE, new Point2D.Double(GameSettings.houseBlueWidth
+				+ GameSettings.houseRedWidth + GameSettings.houseYellowWidth + GameSettings.churchWidth, 0), true);
+
+		gameState.getHouseList().add(b1);
+		gameState.getHouseList().add(b2);
+		gameState.getHouseList().add(b3);
+		gameState.getHouseList().add(b4);
+		gameState.getHouseList().add(b5);
+		gameState.getObjectList().addAll(gameState.getHouseList());
+
 	}
 
 	/** Startet Spiel zum ersten Mal. */
@@ -80,11 +86,7 @@ public class GameController {
 	/** Startet das Spiel neu. */
 	public void restartGame() {
 		gameFrame.dispose();
-//		for(GameObject x:gameState.getObjectList()){
-//			if(x.isAlive()) x.();
-//		}
 		initiate();
-		
 
 	}
 
@@ -93,6 +95,7 @@ public class GameController {
 		gameState.setGameActive(false);
 		long score = gameState.getScore();
 		gameFrame.createGameOverFrame(score);
+		System.out.println(gameState.getObjectList().size());
 	}
 
 	public GameState getGameState() {
@@ -104,64 +107,26 @@ public class GameController {
 	}
 
 	private class BombCreatorThread extends Thread {
-		long timer = System.currentTimeMillis();
-
 		public void run() {
-
 			while (gameState.isGameActive()) {
 
-				int wait = gameState.getLevel()<=7? GameSettings.bombCreatorStartPause - GameSettings.bombCreatorDecreaseNumber*(gameState.getLevel()-1):GameSettings.bombCreatorMinPause;
-				
+				currentBombTime = gameState.getLevel() < 7
+						? GameSettings.bombCreatorStartPause
+								- (gameState.getLevel() - 1) * GameSettings.bombCreatorDecreaseNumber
+						: GameSettings.bombCreatorMinPause;
+
 				try {
-					Thread.sleep(100);
+					Thread.sleep(currentBombTime);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+				}
 
-				}
-				
-				if(System.currentTimeMillis()-timer>wait){
-					System.out.println(System.currentTimeMillis()-timer);
-
-					int pos = (int) ((Math.random() * 400));
-					Bomb bomb = new Bomb(new Point2D.Double(pos, 500));
-					gameState.addObject(bomb);
-					bomb.start();
-					long now = System.currentTimeMillis();
-					timer = now;
-					System.out.println("Ist: " + (now - start) + "ms");
-					start = now;
-				}
-				/*switch(gameState.getLevel()){
-				case 1: 
-					wait = GameSettings.bombCreatorStartPause;
-					break;
-				case 2:
-					wait = 1750;
-					break;
-				case 3: 
-					wait = 1500;
-					break;
-				case 4: 
-					wait = 1250;
-					break;
-				case 5: 
-					wait = 1000;
-					break;
-				case 6: 
-					wait = 750;
-					break;
-				case 7: 
-					wait = 500;
-					break;
-				default:
-					wait = 1500;
-					break;
-				}
-				*/
-				
-				
-				
-				
+				// neue Bombe erstellen, in Objectlist einfügen und den
+				// Bomben-Thread starten
+				int pos = (int) ((Math.random() * 400));
+				Bomb bomb = new Bomb(new Point2D.Double(pos, 500));
+				gameState.addObject(bomb);
+				bomb.start();
 			}
 		}
 	}
@@ -171,7 +136,7 @@ public class GameController {
 		 * TODO Kollision Schaeden Deaktivierte Objects entfernen GameOver
 		 * Levels Scores Summe aller getScore()
 		 */
-		
+
 		public void run() {
 
 			while (gameState.isGameActive()) {
@@ -180,20 +145,24 @@ public class GameController {
 				} catch (InterruptedException ie) {
 					ie.printStackTrace();
 				}
+
 				@SuppressWarnings("unchecked")
 				Vector<GameObject> copy = (Vector<GameObject>) gameState.getObjectList().clone();
+				@SuppressWarnings("unchecked")
+				Vector<GameObject> copy2 = (Vector<GameObject>) gameState.getObjectList().clone();
+
 				Vector<Bomb> bombs = new Vector<Bomb>();
 				int buildings = 0;
 
 				// Bombenliste erstellen
-				for (GameObject x : gameState.getObjectList()) {
+				for (GameObject x : copy2) {// gameState.getObjectList()) {
 					if (x instanceof Bomb) {
 						bombs.add((Bomb) x);
 						copy.remove(x);
 					} else if (x instanceof Building) {
 						buildings += ((Building) x).getScore();
-					}else if(x instanceof Bullet){
-						if(x.outOfView()){
+					} else if (x instanceof Bullet) {
+						if (x.outOfView()) {
 							x.setActive(false);
 							copy.remove(x);
 						}
@@ -205,6 +174,7 @@ public class GameController {
 						x.collide(y);
 
 					}
+					
 				}
 
 				copy.addAll(bombs);
@@ -214,7 +184,7 @@ public class GameController {
 					gameState.setLevel(gameState.getLevel() + 1);
 					gameState.setScore(gameState.getScore() + buildings);
 					gameState.setLevelTime(System.currentTimeMillis());
-					System.out.println("levelhop zu level " + gameState.getLevel());
+				//	System.out.println("levelhop zu level " + gameState.getLevel());
 				}
 			}
 
